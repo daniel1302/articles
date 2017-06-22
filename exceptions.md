@@ -7,7 +7,7 @@ Co a w zasadzie kto skłonił mnie do napisania tego artykułu? Tak naprawdę to
 Dokumentacja PHP mówi:
 >  An exception can be thrown, and caught ("catched") within PHP. Code may be surrounded in a try block, to facilitate the catching of potential exceptions.
 
-> pl: "W PHP wyjątek może zostać rzucony i złapany. Kod może być objęty w blok try to ułatwienia łapania potencjalnych sytuacji wyjatkowych(czyt. "niechcianych).
+> pl: "W PHP wyjątek może zostać rzucony i złapany. Kod może być objęty w blok try  by ułatwić wychwytywanie potencjalnych sytuacji wyjatkowych(czyt. "niechcianych).
 
 No spoko, ale co to ten wyjątek jest? Chyba nigdzie nie znalazłem odpowiedzi na to pytanie...
 Wyjątek to nic innego jak zwykła klasa wbudowana w język programowania, która posiada w sobie jakieś predefiniowane metody oraz własności(zmienne). Klasy wyjątków przeważnie mogą zostać rozbudowane (o ile nie są finalne). Rozszeżać taką klasę można jak każdą inną poprzez dziedziczenie. Jak mówi dokumentacja klasy "wyjątków" mogą być "rzucane" i "łapane" jest to specjalna funkcjonalność klas z rodziny Exception.
