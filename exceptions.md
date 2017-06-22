@@ -6,13 +6,14 @@ Co a w zasadzie kto skłonił mnie do napisania tego artykułu? Tak naprawdę to
 ### Co to jest tak naprawdę ten wyjątek?
 Dokumentacja PHP mówi:
 >  An exception can be thrown, and caught ("catched") within PHP. Code may be surrounded in a try block, to facilitate the catching of potential exceptions.
+
 > pl: "W PHP wyjątek może zostać rzucony i złapany. Kod może być objęty w blok try to ułatwienia łapania potencjalnych sytuacji wyjatkowych(czyt. "niechcianych).
 
 No spoko, ale co to ten wyjątek jest? Chyba nigdzie nie znalazłem odpowiedzi na to pytanie...
 Wyjątek to nic innego jak zwykła klasa wbudowana w język programowania, która posiada w sobie jakieś predefiniowane metody oraz własności(zmienne). Klasy wyjątków przeważnie mogą zostać rozbudowane (o ile nie są finalne). Rozszeżać taką klasę można jak każdą inną poprzez dziedziczenie. Jak mówi dokumentacja klasy "wyjątków" mogą być "rzucane" i "łapane" jest to specjalna funkcjonalność klas z rodziny Exception.
 
 ### Po co nam to? Jak to działa? Co to jest to "rzucanie" i "łapanie"
-Nie bez powodu czynności które możemy wykonywać z wyjątkami nazwyają się "rzucaniem" i "łapaniem". Tak jak w normalnym świecie gdy rzucimy na przykład piłkę możemy ją złapać aby rzucić ją kolejny raz albo poprostu odłożyć na swoje miejsce. W językach programowania zachodzi pewna analogia.
+Nie bez powodu czynności które możemy wykonywać z wyjątkami nazwyają się "rzucaniem" i "łapaniem". Tak jak w normalnym świecie gdy rzucimy na przykład piłkę możemy ją złapać aby rzucić ją kolejny raz albo poprostu odłożyć na swoje miejsce. W językach programowania zachodzi pewna analogia, którą postaram się niżej wyjaśnić.
 
 ###### Po co są wyjątki?
 Tak naprawdę jest to jedno z pytań na które niema jednoznacznej odpowiedzi, ale ogólnie pomagają nam one sterować aplikacją, wyłapywać błędy, które wcześniej przewidzieliśmy, że mogą wystąpić.
