@@ -23,18 +23,18 @@ Mamy zadanie, więc napiszmy sobie algorytm:
 1. Otwórz plik XML.
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
 3. Dla każdego węzła spradź czy zawiera numer telefonu
-	a) Jeśli tak to zapisz do tablicy.
-	b) Jeśli nie to pomiń aktualny węzeł
+  - Jeśli tak to zapisz do tablicy.
+  - Jeśli nie to pomiń aktualny węzeł
 4. Zwróć tablicę z znalezionymi numerami.
 
 Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się sytuacje których nie chcemy. Przeanalizujmy sobie punkt po punkcie nasz algorytm:
 1. Otwórz plik XML.
-	Tutaj mogą pojawić się problemy w postaci: *nieistniejącego pliku* oraz tego, że wczytany plik *nie jest poprawny plikiem XML*. Jakie naspstwa mają takie błędy? 
-		a) Jeśli spróbujemy odczytać plik który nie istnieje to nie zostanie utworzony obiekt "uchwytu pliku" i będzie on NULL'em co spowoduje błędy w dalszym działaniu programu. 
-		b) Jeśli plik nie jest plikiem XML to nie utworzymy obiektu Parsera przez co też będziemy operowali na pustym wskaźniku.
+  - Tutaj mogą pojawić się problemy w postaci: *nieistniejącego pliku* oraz tego, że wczytany plik *nie jest poprawny plikiem XML*. Jakie naspstwa mają takie błędy? 
+    - Jeśli spróbujemy odczytać plik który nie istnieje to nie zostanie utworzony obiekt "uchwytu pliku" i będzie on NULL'em co spowoduje błędy w dalszym działaniu programu. 
+    - Jeśli plik nie jest plikiem XML to nie utworzymy obiektu Parsera przez co też będziemy operowali na pustym wskaźniku.
 
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
-	Ale co gdy dokument jest pusty i główny węzeł nie istnieje? Gdy nie wczytamy węzła i zaczniemy sprawdzać czy ma on dzieci? Znów będziemy chcieli operować na pustym wskaźniku.
+  - Ale co gdy dokument jest pusty i główny węzeł nie istnieje? Gdy nie wczytamy węzła i zaczniemy sprawdzać czy ma on dzieci? Znów będziemy chcieli operować na pustym wskaźniku.
 
 I moglibyśmy wyliczać kolejne błędy, ale nie to jest celem tego artykułu. Jak widzimy możemy dając użytkownikowi program musimy przewidzieć masę niestandardowych rzeczy, do których może doprowadzić użytkownik korzystające z naszego programu. Właśnie w obsłudze takich rzeczy pomagają nam wyjątki.
 
