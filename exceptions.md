@@ -19,14 +19,16 @@ Nie bez powodu czynności które możemy wykonywać z wyjątkami nazwyają się 
 Tak naprawdę jest to jedno z pytań na które niema jednoznacznej odpowiedzi, ale ogólnie pomagają nam one sterować aplikacją, wyłapywać błędy, które wcześniej przewidzieliśmy, że mogą wystąpić.
 Prosty przykład:
 > **Zadanie:** Napisz program który będzie analizował dokumenty XML, szukał w nich wszystkich numerów telefonu i zwracał nam je.
+
 Mamy zadanie, więc napiszmy sobie algorytm:
+```
 1. Otwórz plik XML.
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
 3. Dla każdego węzła spradź czy zawiera numer telefonu
     - Jeśli tak to zapisz do tablicy.
     - Jeśli nie to pomiń aktualny węzeł
 4. Zwróć tablicę z znalezionymi numerami.
-
+```
 Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się sytuacje których nie chcemy. Przeanalizujmy sobie punkt po punkcie nasz algorytm:
 1. Otwórz plik XML.
     - Tutaj mogą pojawić się problemy w postaci: **nieistniejącego pliku** oraz tego, że wczytany plik **nie jest poprawny plikiem XML**. Jakie naspstwa mają takie błędy? 
