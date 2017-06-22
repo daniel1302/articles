@@ -29,9 +29,9 @@ Mamy zadanie, więc napiszmy sobie algorytm:
 
 Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się sytuacje których nie chcemy. Przeanalizujmy sobie punkt po punkcie nasz algorytm:
 1. Otwórz plik XML.
-  - Tutaj mogą pojawić się problemy w postaci: *nieistniejącego pliku* oraz tego, że wczytany plik *nie jest poprawny plikiem XML*. Jakie naspstwa mają takie błędy? 
-    - Jeśli spróbujemy odczytać plik który nie istnieje to nie zostanie utworzony obiekt "uchwytu pliku" i będzie on NULL'em co spowoduje błędy w dalszym działaniu programu. 
-    - Jeśli plik nie jest plikiem XML to nie utworzymy obiektu Parsera przez co też będziemy operowali na pustym wskaźniku.
+    - Tutaj mogą pojawić się problemy w postaci: *nieistniejącego pliku* oraz tego, że wczytany plik *nie jest poprawny plikiem XML*. Jakie naspstwa mają takie błędy? 
+        - Jeśli spróbujemy odczytać plik który nie istnieje to nie zostanie utworzony obiekt "uchwytu pliku" i będzie on NULL'em co spowoduje błędy w dalszym działaniu programu. 
+        - Jeśli plik nie jest plikiem XML to nie utworzymy obiektu Parsera przez co też będziemy operowali na pustym wskaźniku.
 
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
   - Ale co gdy dokument jest pusty i główny węzeł nie istnieje? Gdy nie wczytamy węzła i zaczniemy sprawdzać czy ma on dzieci? Znów będziemy chcieli operować na pustym wskaźniku.
