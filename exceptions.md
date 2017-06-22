@@ -23,8 +23,8 @@ Mamy zadanie, więc napiszmy sobie algorytm:
 1. Otwórz plik XML.
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
 3. Dla każdego węzła spradź czy zawiera numer telefonu
-  - Jeśli tak to zapisz do tablicy.
-  - Jeśli nie to pomiń aktualny węzeł
+ - Jeśli tak to zapisz do tablicy.
+ - Jeśli nie to pomiń aktualny węzeł
 4. Zwróć tablicę z znalezionymi numerami.
 
 Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się sytuacje których nie chcemy. Przeanalizujmy sobie punkt po punkcie nasz algorytm:
