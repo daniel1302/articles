@@ -41,11 +41,11 @@ Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się
 I moglibyśmy wyliczać kolejne błędy, ale nie to jest celem tego artykułu. Jak widzimy możemy dając użytkownikowi program musimy przewidzieć masę niestandardowych rzeczy, do których może doprowadzić użytkownik korzystające z naszego programu. Właśnie w obsłudze takich rzeczy pomagają nam wyjątki.
 
 ##### Jak działają wyjątki?
-Po pierwsze wyjątek musi zostać rzucony poprzez słowo kluczowe 
+Po pierwsze wyjątek musi zostać rzucony poprzez słowo kluczowe throw 
 ```php
 throw new Exception("..."); 
 ```
-w tym momęcie program **przerywa** swoje działanie i wykonuje **skok** w inne miejsce. Jeśli wyjątek został rzucony poza blokiem "**try**" to program kończy się **błędem**. Natomiast jeśli rzuciliśmy wyjątek w kodzie który jest objęty klamrami bloku **try** { }, to program wykonuje skok do najbliższego bloku **catch** który **jest go w stanie złapać**. W momęcie złapania wyjątku **odzyskujemy kontrolę** nad programem i dostajemy dostęp do rzuconego wyjątku. Taki rzucony wyjątek może mieć w sobie informację o błędzie który wystąpił w programie. Najprostszymi informacjami niesionymi przez taki obiekt są: wiadomośc, kod błędu, i poprzedni błąd. Oczywiście sami możemy definiować jakie informacje ma taki obiekt.
+w tym momencie tracimy program **przerywa** swoje działanie i wykonuje **skok** w inne miejsce. Jeśli wyjątek został rzucony poza blokiem "**try**" to program kończy się **błędem**. Natomiast jeśli rzuciliśmy wyjątek w kodzie który jest objęty klamrami bloku **try** { }, to program wykonuje skok do najbliższego bloku **catch** który **jest go w stanie złapać**. W momęcie złapania wyjątku **odzyskujemy kontrolę** nad programem i dostajemy dostęp do rzuconego wyjątku. Taki rzucony wyjątek może mieć w sobie informację o błędzie który wystąpił w programie. Najprostszymi informacjami niesionymi przez taki obiekt są: wiadomośc, kod błędu, plik w którym został wyrzucony, linię itp. Oczywiście sami możemy definiować jakie informacje ma taki obiekt.
 
 >> Analizując poniższy przykład zastanów się które działania się wykonają po kolei i jaka jest wartość zmiennej $i po wykonaniu programu.
 Przykład:
