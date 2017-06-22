@@ -47,6 +47,46 @@ throw new Exception("...");
 ```
 w tym momęcie program **przerywa** swoje działanie i wykonuje **skok** w inne miejsce. Jeśli wyjątek został rzucony poza blokiem "**try**" to program kończy się **błędem**. Natomiast jeśli rzuciliśmy wyjątek w kodzie który jest objęty klamrami bloku **try** { }, to program wykonuje skok do najbliższego bloku **catch** który **jest go w stanie złapać**. W momęcie złapania wyjątku **odzyskujemy kontrolę** nad programem i dostajemy dostęp do rzuconego wyjątku. Taki rzucony wyjątek może mieć w sobie informację o błędzie który wystąpił w programie. Najprostszymi informacjami niesionymi przez taki obiekt są: wiadomośc, kod błędu, i poprzedni błąd. Oczywiście sami możemy definiować jakie informacje ma taki obiekt.
 
-Przykład: 
+>> Analizując poniższy przykład zastanów się które działania się wykonają po kolei i jaka jest wartość zmiennej $i po wykonaniu programu.
+Przykład:
+```php
+try {
+                try {
+                    //Dzialanie 1:
+                    $i = 0;
+                    //Dzialanie 2:
+                    $i = $i + 10; //Do tego momentu kod się wykonuje normalnie
 
-Oto program z komentarzami
+                    throw new RuntimeException("Komunikat"); //Tutaj po rzuceniu wyjątku następuje skok do najbliższego bloku catch który jest w stanie złapać ten wyjątek
+
+                    //Dzialanie 3:
+                    $i = $i + 5; //Ten kod się nigdy nie wykona, ponieważ został przeskoczony przez wyrzucenie wyjątku
+                } catch (LogicException $ex) {
+                    print('Wystąpił wyjątek aplikacji: '.$ex->getMessage()); //Ten komunikat nie zostaje wyświetlony ponieważ my rzuciliśmy RuntimeException a ten blok obsługuje wyjątek logiczny
+                }
+                
+                //Dzialanie 4:
+                $i = $i + 2; //Ten kod też nie zostanie wykonany bo wyjątek nie został złapany więc próbuje skakać dalej do kolejnego bloku catch
+            } catch (RuntimeException $ex) { //W tym miejscu nasz wyjątek który rzuciliśmy zostaje złapany i wykona się kod z tego bloku
+                //W tym momencie odzyskujemy pełną kontrolę nad działaniem programu
+                print('Wystąpił wyjątek aplikacji typu Runtime: '.$ex->getMessage()); //Na ekranie zobaczymy ten komunikat
+            }
+
+            //Dzialanie 5:
+            $i = $i + 20; //Ten kod się wykona się już normalnie
+```
+
+Wykonają się działania: 1, 2, 5, więc zmienna $i = $i + 10 + 20. Wiec po wykonaniu programu $i = 30
+
+
+
+Przykład:
+> **Zadanie:** Napisz program który umożliwi dzielenie dwóch liczb.
+
+Zadanie bardzo proste ale wystarczy do zobrazowania zasady działania wyjątków
+
+```php
+Class ArythmeticOperation
+{
+	public function (float
+
