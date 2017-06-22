@@ -18,23 +18,23 @@ Nie bez powodu czynności które możemy wykonywać z wyjątkami nazwyają się 
 ###### Po co są wyjątki?
 Tak naprawdę jest to jedno z pytań na które niema jednoznacznej odpowiedzi, ale ogólnie pomagają nam one sterować aplikacją, wyłapywać błędy, które wcześniej przewidzieliśmy, że mogą wystąpić.
 Prosty przykład:
-> *Zadanie:* Napisz program który będzie analizował dokumenty XML, szukał w nich wszystkich numerów telefonu i zwracał nam je.
+> **Zadanie:** Napisz program który będzie analizował dokumenty XML, szukał w nich wszystkich numerów telefonu i zwracał nam je.
 Mamy zadanie, więc napiszmy sobie algorytm:
 1. Otwórz plik XML.
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
 3. Dla każdego węzła spradź czy zawiera numer telefonu
- - Jeśli tak to zapisz do tablicy.
- - Jeśli nie to pomiń aktualny węzeł
+    - Jeśli tak to zapisz do tablicy.
+    - Jeśli nie to pomiń aktualny węzeł
 4. Zwróć tablicę z znalezionymi numerami.
 
 Oczywiście jest to bardzo uproszczony algorytm, ale i tutaj mogą pojawić się sytuacje których nie chcemy. Przeanalizujmy sobie punkt po punkcie nasz algorytm:
 1. Otwórz plik XML.
-    - Tutaj mogą pojawić się problemy w postaci: *nieistniejącego pliku* oraz tego, że wczytany plik *nie jest poprawny plikiem XML*. Jakie naspstwa mają takie błędy? 
+    - Tutaj mogą pojawić się problemy w postaci: **nieistniejącego pliku** oraz tego, że wczytany plik **nie jest poprawny plikiem XML**. Jakie naspstwa mają takie błędy? 
         - Jeśli spróbujemy odczytać plik który nie istnieje to nie zostanie utworzony obiekt "uchwytu pliku" i będzie on NULL'em co spowoduje błędy w dalszym działaniu programu. 
         - Jeśli plik nie jest plikiem XML to nie utworzymy obiektu Parsera przez co też będziemy operowali na pustym wskaźniku.
 
 2. Otwórz główny węzeł i zacznij przetwarzać po kolei wszystkie węzły znajdujące się w nim.
-  - Ale co gdy dokument jest pusty i główny węzeł nie istnieje? Gdy nie wczytamy węzła i zaczniemy sprawdzać czy ma on dzieci? Znów będziemy chcieli operować na pustym wskaźniku.
+  - Ale co gdy dokument jest pusty i **główny węzeł nie istnieje**? Gdy nie wczytamy węzła i zaczniemy sprawdzać czy ma on dzieci? Znów będziemy chcieli operować na pustym wskaźniku.
 
 I moglibyśmy wyliczać kolejne błędy, ale nie to jest celem tego artykułu. Jak widzimy możemy dając użytkownikowi program musimy przewidzieć masę niestandardowych rzeczy, do których może doprowadzić użytkownik korzystające z naszego programu. Właśnie w obsłudze takich rzeczy pomagają nam wyjątki.
 
@@ -43,7 +43,7 @@ Po pierwsze wyjątek musi zostać rzucony poprzez słowo kluczowe
 ```php
 throw new Exception("..."); 
 ```
-w tym momęcie program przerywa swoje działanie i wykonuje skok w inne miejsce. Jeśli wyjątek został rzucony poza blokiem "try" to program kończy się błędem. Natomiast jeśli rzuciliśmy wyjątek w kodzie który jest objęty klamrami bloku try { }, to program wykonuje skok do najbliższego bloku catch który jest go w stanie złapać. W momęcie złapania wyjątku odzyskujemy kontrolę nad programem i dostajemy dostęp do rzuconego wyjątku. Taki rzucony wyjątek może mieć w sobie informację o błędzie który wystąpił w programie. Najprostszymi informacjami niesionymi przez taki obiekt są: wiadomośc, kod błędu, i poprzedni błąd. Oczywiście sami możemy definiować jakie informacje ma taki obiekt.
+w tym momęcie program **przerywa** swoje działanie i wykonuje **skok** w inne miejsce. Jeśli wyjątek został rzucony poza blokiem "**try**" to program kończy się **błędem**. Natomiast jeśli rzuciliśmy wyjątek w kodzie który jest objęty klamrami bloku **try** { }, to program wykonuje skok do najbliższego bloku **catch** który **jest go w stanie złapać**. W momęcie złapania wyjątku **odzyskujemy kontrolę** nad programem i dostajemy dostęp do rzuconego wyjątku. Taki rzucony wyjątek może mieć w sobie informację o błędzie który wystąpił w programie. Najprostszymi informacjami niesionymi przez taki obiekt są: wiadomośc, kod błędu, i poprzedni błąd. Oczywiście sami możemy definiować jakie informacje ma taki obiekt.
 
 Przykład: 
 
