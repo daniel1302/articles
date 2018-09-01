@@ -290,9 +290,35 @@ Po więcej informacji informacji zapraszam do [oficjalnej dokumentacji](http://p
 
 ### Metryki
 
+##### Informacje
 
+PHP-FPM udostępnia nam też metryki. Najpierw opiszmy co to są za metryki i co pozwalają nam 
+monitorować: 
 
+* pool - Nazwa puli
+* process manager - typ użytego w puli managera procesów [static, dynamic, ondemand]
+* start time - data i czas ostatniego załadowania konfiguracji przez php-fpm
+* start since - liczba sekund jaką działą php-fpm
+* accepted conn - liczba zaakceptownych przez pulę połączeń
+* listen queue - liczba żądań oczekujących na przetworzenie w kolejce 
+* max listen queue - maksymalna wielkość kolejki
+* listen queue len - rozmiar kolejki socketu do którego jesteśmy podłączeni
+* idle processes - liczba workerów, które są gotowe do przyjęcia żąania
+* active processes - liczba aktywnych procesów/workerów, czyli tych które wykonują żądania.
+* total processes - całkowita liczba uruchomionych workerów(idle + active)
+* max active processes - maksymalna liczba workerów jakie kiedykolwiek były uruchomione
+* max children reached - Liczba ta jest zwiększana za każdym razem gdy php-fpm chce uruchomić nowy worker, a ma otwartą maksymalną ilość workerów.
 
+##### Na co zwracać uwagę?
+Zależnie od tego jakiego managera procesów używamy inaczej wygląda monitoring aplikacji. 
+Ja zazwyczaj używam dynamicznego managera procesów i Tobie zalecam to samo.
+Gdy dynamicznie uruchamiamy nowe workery najważniejszą wartością jest `max children reached`.
+Wartość ta powinna być równa 0. Jeśli jest większa niż 0 oznacza, że mamy za mało workerów i 
+powinniśmy zwiększyć ich ilość. Często przyczyną tego, że liczba jest > 0 jest to, że aplikacja 
+działa zbyt wolno. Mamy za dużo zapytań do bazy danych, oczekujemy na wyniki z zewnętrznego API,
+mamy ciężkie obliczenia generowanie PDF'ów itp...
+
+Podczas zwiększania maksymalnej ilości procesów przydaje się wartość `max active processes`.
 
 
 
