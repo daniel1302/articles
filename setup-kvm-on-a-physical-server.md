@@ -119,8 +119,10 @@ eno2:
 ```
 
 What is this configuration mean?
-`dhcp4: false` - With this directive, We disable DHCP for our interfaces. We don't want any IP for the physical interface. We can disable DHCP also for br0 because We assigned the static IP(192.168.0.100).
-`interfaces: [eno2]` - Determine which interface do you want to bridge.
+
+- `dhcp4: false` - With this directive, We disable DHCP for our interfaces. We don't want any IP for the physical interface. We can disable DHCP also for br0 because We assigned the static IP(192.168.0.100).
+- `interfaces: [eno2]` - Determine which interface do you want to bridge.
+- Rest of the fields are straightforward
 
 *Note:* Remember to replace config with your parameters.
 
