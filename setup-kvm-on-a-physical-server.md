@@ -29,6 +29,7 @@ As part of my learning, I will try to explain to you how to install KVM on physi
 ## KVM instalation
   ... TODO ...
   
+----
   
 ## KVM configuration
 
@@ -51,6 +52,7 @@ As part of my learning, I will try to explain to you how to install KVM on physi
         └── host-bridge.xml
 ```
 
+<br>
 
 ### Qemu config
 Open the file: /etc/libvirt/qemu.conf and change the following values:
