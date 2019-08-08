@@ -29,7 +29,6 @@ As part of my learning, I will try to explain to you how to install KVM on physi
 ## KVM instalation
   ... TODO ...
   
-----
   
 ## KVM configuration
 
@@ -71,6 +70,8 @@ Then restart the `libvirtd` service
 ```
 # service libvirt restart
 ```
+
+<br>
 
 ### Host bridge network
 I use `Ubuntu Server 18.04.3 LTS`, and I am going to prepare creating bridge network for this system.
