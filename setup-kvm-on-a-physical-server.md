@@ -1,6 +1,6 @@
 # Setup KVM on a physical server
 
-As part of my learning, I will try to explain to you how to install KVM on physical computer and server. That is the first step to install the OpenStack.
+As part of my learning, I will try to explain to you how to install KVM on physical computer and server. That is the first stop on the road to install the OpenStack.
 
 ### Assumptions:
 
