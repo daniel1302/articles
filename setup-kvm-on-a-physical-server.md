@@ -210,3 +210,77 @@ And you should be able to see a KVM NAT interface, with some DHCP IP:
        valid_lft forever preferred_lft forever
 ```
 
+
+<br>
+
+### Create storage
+
+#### What are KVM pools? 
+
+Today, everybody uses different disks, settings, partitions, file systems, etc.
+
+All storages have pros and cons. Ones provide better control others are faster.  For example, an application which is doing some computations and save data on HDD requires a faster drive than DB, which keeps user DB.
+
+KVM pools come against those problems. KVM pool is a mechanism, which helps us manage our drives. For example, We can create one for SSD drives and the second one for HDD drives. Users/administrators that use our infrastructure does not need to know what is under the mask. 
+
+We have a few types of pool types:
+
+- dir - uses direcectory as a storage for volumes.
+- disk - uses physical hard disks as a storage for volumes.
+- fs - uses preformated partition to store volumes.
+- lvm - uses LVM volume as a storage driver.
+- netfs - uses Use network file system(like NFS) to store volumes.
+
+
+#### Let's start...
+
+1. Create pool on /mapper/red01/kvm/disks . Let's call it 
+
+```
+virsh pool-define-as   \
+  --name kvm-disks     \
+  --type dir          \
+  --target /mapper/red01/kvm/disks
+
+virsh pool-build kvm-pool
+virsh pool-start kvm-pool
+virsh pool-autostart kvm-pool
+```
+
+Above commands define pool with the type of dir, called kvm-disks, which points to the /mapper/red01/kvm/disks directory. The next CLI command builds the pool. For the dir type, it is not necessary, but for another(like a disk), it is required to prepare filesystem. Then we start the pool and enable autostart.
+
+
+2. Verify, your configuration
+
+Run the `virsh pool-list` command:
+
+```
+ Name                 State      Autostart
+-------------------------------------------
+ default              active     yes
+ kvm-disks            active     yes
+```
+
+Run the `virsh pool-dumpxml command: 
+
+```
+<pool type='dir'>
+  <name>kvm-disks</name>
+  <uuid>4ab0ab6e-5006-4dcf-9fdf-d769946783b5</uuid>
+  <capacity unit='bytes'>7936293720064</capacity>
+  <allocation unit='bytes'>346643271680</allocation>
+  <available unit='bytes'>7589650448384</available>
+  <source>
+  </source>
+  <target>
+    <path>/mapper/red01/kvm/disks</path>
+    <permissions>
+      <mode>0755</mode>
+      <owner>0</owner>
+      <group>0</group>
+    </permissions>
+  </target>
+</pool>
+```
+
+Now we can verify if everything is correct. If not, you can run the `virsh pool-edit kvm-disks` command.
