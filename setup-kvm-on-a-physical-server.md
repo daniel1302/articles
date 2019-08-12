@@ -261,7 +261,7 @@ Run the `virsh pool-list` command:
  kvm-disks            active     yes
 ```
 
-Run the `virsh pool-dumpxml command: 
+Run the `virsh pool-dumpxml` command: 
 
 ```
 <pool type='dir'>
