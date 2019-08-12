@@ -26,11 +26,11 @@ As part of my learning, I will try to explain to you how to install KVM on physi
       - HDD RAID5 8TB
       
       
-## KVM instalation
+# KVM instalation
   ... TODO ...
   
   
-## KVM configuration
+# KVM configuration
 
 ### Infrastructure, you need to modify.
 
@@ -53,7 +53,7 @@ As part of my learning, I will try to explain to you how to install KVM on physi
 
 <br>
 
-### Qemu config
+## Qemu config
 Open the file: /etc/libvirt/qemu.conf and change the following values:
 
 ```
@@ -73,7 +73,7 @@ Then restart the `libvirtd` service
 
 <br>
 
-### Host bridge network
+## Host bridge network
 I use `Ubuntu Server 18.04.3 LTS`, and I am going to prepare creating bridge network for this system.
 
 #### Enable forwarding. 
@@ -213,7 +213,7 @@ And you should be able to see a KVM NAT interface, with some DHCP IP:
 
 <br>
 
-### Create storage
+## Create storage
 
 #### What are KVM pools? 
 
