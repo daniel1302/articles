@@ -221,7 +221,7 @@ Today, everybody uses different disks, settings, partitions, file systems, etc.
 
 All storages have pros and cons. Ones provide better control others are faster.  For example, an application which is doing some computations and save data on HDD requires a faster drive than DB, which keeps user DB.
 
-KVM pools come against those problems. KVM pool is a mechanism, which helps us manage our drives. For example, We can create one for SSD drives and the second one for HDD drives. Users/administrators that use our infrastructure does not need to know what is under the mask. 
+KVM pools come against those problems. KVM pool is a mechanism, which helps us manage our drives. For example, We can create one for SSD drives and the second one for HDD drives. Users/administrators that use our infrastructure does not need to know what is under the mask. We can think about that like about a container or like about abstraction layer that isolates physical devices between software.
 
 We have a few types of pool types:
 
