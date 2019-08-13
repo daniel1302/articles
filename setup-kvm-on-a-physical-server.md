@@ -11,7 +11,7 @@ As part of my learning, I will try to explain to you how to install KVM on physi
   - As much automation as possible
 
 Note:
-  * Usually, I work with servers I have no real access. Also, my connection to the internet is slow, so it is not possible to transfer the graphic interface.
+  \* Usually, I work with servers I have no real access. Also, my connection to the internet is slow, so it is not possible to transfer the graphic interface.
 
 ### Triggered topics:
 
