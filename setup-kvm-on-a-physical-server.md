@@ -4,19 +4,23 @@ As part of my learning, I will try to explain to you how to install KVM on physi
 
 ### Assumptions:
 
+  - Do not use GUI*
   - KVM cluster
   - All VM stored on /mapper/red01(Raid5 matrix)
   - Two networks: NAT and Bridge to physical interface
   - As much automation as possible
-  
+
+Note:
+  * Usually, I work with servers I have no real access. Also, my connection to the internet is slow, so it is not possible to transfer the graphic interface.
+
 ### Triggered topics:
 
   - Ansible
   - Linux networking
   - libvirt
-  
- ### Machine I run cluster on:
- 
+
+### Machine I run cluster on:
+
   - CPU: 2x Intel(R) Xeon(R) CPU E5645 @ 2.40GHz
   - RAM: 128 GB
   - HDD:
@@ -24,12 +28,27 @@ As part of my learning, I will try to explain to you how to install KVM on physi
       - HDD RAID1 1TB
       - HDD RAID5 8TB
       - HDD RAID5 8TB
-      
-      
+
+### Naming conventions
+
+I follow my convention of naming. I have a few servers called by dragon names like Farnir, Smaug, etc. That name becomes the environment for all running machines and programs. You should find your standards and follow them.
+Host name contains following parts:
+
+    - Environment name
+    - Destiny / Use case
+    - System version (optional)
+
+An exception is the base image, which is base for all next virtual machines.
+
+Examples:
+- Domain: `kvm-smaug`, `kvm-farnir`
+- Host names: `smaug-mysql`,
+
+
 # KVM instalation
   ... TODO ...
-  
-  
+
+
 # KVM configuration
 
 ### Infrastructure, you need to modify.
@@ -76,7 +95,7 @@ Then restart the `libvirtd` service
 ## Host bridge network
 I use `Ubuntu Server 18.04.3 LTS`, and I am going to prepare creating bridge network for this system.
 
-#### Enable forwarding. 
+#### Enable forwarding.
 Open the /etc/sysctl.conf file and uncomment/add following line:
 
 ```
@@ -215,7 +234,7 @@ And you should be able to see a KVM NAT interface, with some DHCP IP:
 
 ## Create storage
 
-#### What are KVM pools? 
+#### What are KVM pools?
 
 Today, everybody uses different disks, settings, partitions, file systems, etc.
 
@@ -234,7 +253,7 @@ We have a few types of pool types:
 
 #### Let's start...
 
-1. Create pool on /mapper/red01/kvm/disks . Let's call it 
+1. Create pool on /mapper/red01/kvm/disks . Let's call it
 
 ```
 virsh pool-define-as   \
@@ -261,7 +280,7 @@ Run the `virsh pool-list` command:
  kvm-disks            active     yes
 ```
 
-Run the `virsh pool-dumpxml` command: 
+Run the `virsh pool-dumpxml` command:
 
 ```
 <pool type='dir'>
@@ -284,3 +303,158 @@ Run the `virsh pool-dumpxml` command:
 ```
 
 Now we can verify if everything is correct. If not, you can run the `virsh pool-edit kvm-disks` command.
+
+<br>
+
+## Deploy first VM
+
+On the beginning, I will provide the bash command and explain a bit what it does. To create a new VM, I am going to use the virt-install bash command, which comes from virt tools.
+
+```
+virt-install \
+  --virt-type=kvm \
+  --name debian10-base \
+  --ram 8000 \
+  --disk pool=kvm-disks,sparse=true,size=20 \
+  --vcpus 4 \
+  --os-type linux \
+  --os-variant debian9 \
+  --network network=default \
+  --graphics none \
+  --console pty,target_type=serial \
+  --location 'http://ftp.nl.debian.org/debian/dists/buster/main/installer-amd64/' \
+  --extra-args 'console=ttyS0,115200n8 serial'
+```
+
+Command has a lot of parameters. You can read more here: https://linux.die.net/man/1/virt-install.
+
+  - `virt-type` - The hypervisor to install on. We are using KVM so, choice is clear.
+  - `name` - Name of our VM
+  - `ram` - Ram allocation for our VM
+  - `disk` - Configure disk.
+  - `vcpus` - Number of virtual CPUs allocated for VM
+  - `os-type` - Type of virtualized system
+  - `os-varian` - Variant of selected OS, used for futher optimizazations. For now libvirt does not support Debian 10.
+  - `network` - Network settings*
+  - `graphics` - Settings of graphics interface. We do not need graphics support for now, so disable it
+  - `console` - Connect VMs console to pty, with type serial. Serial is configured in `extra-args`
+  - `location` - Location of installation disk. For more disks see below.
+
+You can notice, I used only one network. Moreover, this is the default network. It's a good catch, but It is aware because I want to show you **How to attach network interface and set up it in the guest OS**.
+
+Ok, let's type above command and install your OS. My installation parameters:
+
+#### Install system
+
+- Language: `English`
+- Location: `Poland`
+- Locales: `United States - en_US.UTF-8`
+- Keyboard: `American English`
+- Hostname: `debian10-base`
+- Domain name: `kvm-smaug`
+- Username for your account: `kvm`
+
+Disk partitions:
+
+- ext4, size: 10GB, mount point: /
+- ext4, size: 10GB, mount point: /home
+
+Software to install
+
+- SSH Server
+- standard system utilities
+
+Install GRUB in /dev/vda.
+
+#### Verify installation
+
+1. Log in as root (or kvm).
+2. Type `ip a` to see your IP. In my example, I can see my IP address is `192.168.122.100`. That IP belongs to default networks. Make a note this address.
+
+```
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: ens2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 52:54:00:f9:5f:ec brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.100/24 brd 192.168.122.255 scope global dynamic ens2
+       valid_lft 3209sec preferred_lft 3209sec
+    inet6 fe80::5054:ff:fef9:5fec/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+3. Verify if your SSH server is running. Type `systemctl status sshd`
+
+```
+ssh.service - OpenBSD Secure Shell server
+   Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enab
+   Active: active (running) since Tue 2019-08-13 14:49:52 CEST; 8min ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+  Process: 387 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+ Main PID: 395 (sshd)
+    Tasks: 1 (limit: 4915)
+   Memory: 3.7M
+           └─395 /usr/sbin/sshd -D
+
+Aug 13 14:49:52 debian10-base systemd[1]: Starting OpenBSD Secure Shell server..
+Aug 13 14:49:52 debian10-base sshd[395]: Server listening on 0.0.0.0 port 22.
+Aug 13 14:49:52 debian10-base sshd[395]: Server listening on :: port 22.
+Aug 13 14:49:52 debian10-base systemd[1]: Started OpenBSD Secure Shell server.
+```
+
+4. Reboot VM to see if everything is working as expected. To do that run `systemctl reboot`.
+
+5. Detach console by typing: `CRTL + ^`. It did not work for me, so I closed the terminal.
+
+6. Try to connect to your VM from the host computer.
+
+```
+ssh kvm@192.168.122.100
+```
+7. If everything is working, you did a great job!
+
+
+#### Installation images:
+
+| Distro name  | OS variant    | URL                                                                    |
+| ------------ | ------------- | -----------------------------------------------------------------------|
+| Debian 10    | debian9       | http://ftp.nl.debian.org/debian/dists/buster/main/installer-amd64/     |
+| Debian 9     | debian9       | http://ftp.nl.debian.org/debian/dists/stretch/main/installer-amd64/    |
+| Debian 8     | debian8       | http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/     |
+| Debian 7     | debian7       | http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/     |
+| Debian 6     | debian6       | http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-amd64/    |
+| CentOS 7     | centos7       | http://mirror.i3d.net/pub/centos/7/os/x86_64/                          |
+| CentOS 6     | centos6       | http://mirror.i3d.net/pub/centos/6/os/x86_64/                          |
+| CentOS 5     | centos5       | http://mirror.i3d.net/pub/centos/5/os/x86_64/                          |
+| Ubuntu 18.04 | linux         | http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/    |
+| Ubuntu 16.04 | linux         | http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/    |
+| Ubuntu 14.04 | linux         | http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/    |
+| Ubuntu 12.04 | linux         | http://archive.ubuntu.com/ubuntu/dists/precise/main/installer-amd64/   |
+| Ubuntu 10.04 | linux         | http://archive.ubuntu.com/ubuntu/dists/lucid/main/installer-amd64/     |
+| OpenSUSE 13  | linux         | http://download.opensuse.org/distribution/13.2/repo/oss/               |
+| OpenSUSE 12  | linux         | http://download.opensuse.org/distribution/12.3/repo/oss/               |
+| OpenSUSE 11  | linux         | http://download.opensuse.org/distribution/11.4/repo/oss/               |
+
+<br>
+
+## Attach network
+
+... TODO ...
+
+
+<br>
+
+## Expand HDD
+
+### Scenario 1: Expand the attached volume
+
+### Scenario 2: Attach new disk and map to specific location (/var/lib/mysql)
+
+### Scenario 3: Attach new disk and expand root (/)
+
+
+... TODO ...
