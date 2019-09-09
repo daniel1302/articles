@@ -444,8 +444,171 @@ ssh kvm@192.168.122.100
 
 ## Attach network
 
-... TODO ...
+On the beginning, let's list all our networks on the KVM node. Execute the following command:  `virsh net-list`.
 
+```
+virsh net-list
+
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+```
+
+We can notice only the default network is available. Let's create a new one then.
+
+cat /var/lib/libvirt/networks/host-bridge.xml
+
+1. Create a new network file in the `/var/lib/libvirt/networks/host-bridge.xml`
+File content: 
+
+    ```
+    <network>
+    <name>host-bridge</name>
+    <forward mode="bridge"/>
+    <bridge name="br0"/>
+    </network>
+    ```
+
+2. Create a network based on the XML file. Execute the following commands: 
+    ```
+    net-define /var/lib/libvirt/networks/host-bridge.xml
+    virsh net-start host-bridge
+    virsh net-autostart host-bridge
+    ```
+
+    Example: 
+
+    ```
+    net-define /var/lib/libvirt/networks/host-bridge.xml
+    Network host-bridge-1 defined from /var/lib/libvirt/networks/host-bridge.xml
+
+    # virsh net-list --all
+    Name                 State      Autostart     Persistent
+    ----------------------------------------------------------
+    default              active     yes           yes
+    host-bridge          inactive   no            yes
+
+    # virsh net-start host-bridge
+    Network host-bridge started
+
+    # virsh net-list
+    Name                 State      Autostart     Persistent
+    ----------------------------------------------------------
+    default              active     yes           yes
+    host-bridge          active     no            yes
+
+    # virsh net-autostart host-bridge
+    Network host-bridge marked as autostarted
+
+    # virsh net-list
+    Name                 State      Autostart     Persistent
+    ----------------------------------------------------------
+    default              active     yes           yes
+    host-bridge          active     yes           yes
+    ```
+
+3. I assume you have got VM called `debian10-base`. Let's find it.
+
+    ```
+    # virsh list
+    Id    Name                           State
+    ----------------------------------------------------
+    41    debian10-base                  running
+    ```
+
+4. SSH into VM:
+
+    ```
+    virsh console debian10-base
+    ```
+
+5. See current network settings.
+    ```
+    root@debian10-base:~# ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+        valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host
+        valid_lft forever preferred_lft forever
+    2: ens2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+        link/ether 52:54:00:f9:5f:ec brd ff:ff:ff:ff:ff:ff
+        inet 192.168.122.100/24 brd 192.168.122.255 scope global dynamic ens2
+        valid_lft 3583sec preferred_lft 3583sec
+        inet6 fe80::5054:ff:fef9:5fec/64 scope link
+        valid_lft forever preferred_lft forever
+    ```
+
+6. Type `CTRL + ]` to exit from the attached console.
+
+7. Generate random MAC address.
+
+    ```
+    openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/:$//'
+    52:54:00:4b:73:5f
+    ```
+
+8. Attach interface with the following command:
+
+    ```
+    # virsh attach-interface    \
+        --domain debian10-base  \
+        --type network          \
+        --source host-bridge    \
+        --model virtio          \
+        --mac 52:54:00:4b:73:5f \
+        --config                \
+        --live
+    ```
+
+9. It's good time to restart our VM
+
+    ```
+    # virsh reboot debian10-base
+    Domain debian10-base is being rebooted
+    ```
+
+10. SSH into VM with `virsh console debian10-base`. Then see available networks:
+
+    ```
+    root@debian10-base:~# ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+        valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host
+        valid_lft forever preferred_lft forever
+    2: ens2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+        link/ether 52:54:00:f9:5f:ec brd ff:ff:ff:ff:ff:ff
+        inet 192.168.122.100/24 brd 192.168.122.255 scope global dynamic ens2
+        valid_lft 3583sec preferred_lft 3583sec
+        inet6 fe80::5054:ff:fef9:5fec/64 scope link
+        valid_lft forever preferred_lft forever
+    3: ens9: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+        link/ether 52:54:00:4b:73:5f brd ff:ff:ff:ff:ff:ff
+    ```
+
+11. We can see our MAC addres: `52:54:00:4b:73:5f`. Now lets UP the interface
+
+    ```
+    ip link set dev ens9 up
+    ```
+
+12. See if Interface is up
+
+    ```
+    ip a
+    
+    3: ens9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 52:54:00:4b:73:5f brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::5054:ff:fe4b:735f/64 scope link
+       valid_lft forever preferred_lft forever
+
+    ``
+
+
+... TODO ...
+virsh attach-interface --domain debian10-base --type bridge --source host-bridge  --model virtio
 
 <br>
 
