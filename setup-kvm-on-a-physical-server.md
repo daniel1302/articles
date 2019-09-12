@@ -471,15 +471,15 @@ File content:
 
 2. Create a network based on the XML file. Execute the following commands: 
     ```
-    net-define /var/lib/libvirt/networks/host-bridge.xml
-    virsh net-start host-bridge
-    virsh net-autostart host-bridge
+    # virsh net-define /var/lib/libvirt/networks/host-bridge.xml
+    # virsh net-start host-bridge
+    # virsh net-autostart host-bridge
     ```
 
     Example: 
 
     ```
-    net-define /var/lib/libvirt/networks/host-bridge.xml
+    # virsh net-define /var/lib/libvirt/networks/host-bridge.xml
     Network host-bridge-1 defined from /var/lib/libvirt/networks/host-bridge.xml
 
     # virsh net-list --all
@@ -524,7 +524,7 @@ File content:
 
 5. See current network settings.
     ```
-    root@debian10-base:~# ip a
+    # ip a
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
         inet 127.0.0.1/8 scope host lo
@@ -544,7 +544,7 @@ File content:
 7. Generate random MAC address.
 
     ```
-    openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/:$//'
+    # openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/:$//'
     52:54:00:4b:73:5f
     ```
 
@@ -561,17 +561,29 @@ File content:
         --live
     ```
 
-9. It's good time to restart our VM
+9. Disable netfilter on the bridge. This is required to disable filtering packages by our KVM host for bridged interfaces.
+
+    ```
+    # cat >> /etc/sysctl.conf <<EOF
+    net.bridge.bridge-nf-call-ip6tables = 0
+    net.bridge.bridge-nf-call-iptables = 0
+    net.bridge.bridge-nf-call-arptables = 0
+    EOF
+    # sysctl -p /etc/sysctl.conf
+    ```
+
+10. It's good time to restart our VM
 
     ```
     # virsh reboot debian10-base
     Domain debian10-base is being rebooted
     ```
 
-10. SSH into VM with `virsh console debian10-base`. Then see available networks:
+11. SSH into VM with `virsh console debian10-base`. Then see available networks:
 
     ```
-    root@debian10-base:~# ip a
+    # ip a
+
     1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
         link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
         inet 127.0.0.1/8 scope host lo
@@ -588,27 +600,55 @@ File content:
         link/ether 52:54:00:4b:73:5f brd ff:ff:ff:ff:ff:ff
     ```
 
-11. We can see our MAC addres: `52:54:00:4b:73:5f`. Now lets UP the interface
+12. We can see our MAC addres: `52:54:00:4b:73:5f`. Now lets UP the interface
 
     ```
-    ip link set dev ens9 up
+    # ip link set dev ens9 up
     ```
 
-12. See if Interface is up
+13. See if the interface is up
 
     ```
-    ip a
-    
+    # ip a
+
     3: ens9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
     link/ether 52:54:00:4b:73:5f brd ff:ff:ff:ff:ff:ff
     inet6 fe80::5054:ff:fe4b:735f/64 scope link
        valid_lft forever preferred_lft forever
 
-    ``
+    ```
 
+14. Obtain new IP from DHCP server with `/usr/sbin/dhclient <interface name>`
 
-... TODO ...
-virsh attach-interface --domain debian10-base --type bridge --source host-bridge  --model virtio
+    ```
+    # /usr/sbin/dhclient ens9
+    ```
+
+15. That's it! You should be able to see what is your IP:
+
+    ```
+    # ip a
+
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+        valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host
+        valid_lft forever preferred_lft forever
+    2: ens2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+        link/ether 52:54:00:f9:5f:ec brd ff:ff:ff:ff:ff:ff
+        inet 192.168.122.100/24 brd 192.168.122.255 scope global dynamic ens2
+        valid_lft 2480sec preferred_lft 2480sec
+        inet6 fe80::5054:ff:fef9:5fec/64 scope link
+        valid_lft forever preferred_lft forever
+    3: ens9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+        link/ether 52:54:00:4b:73:5f brd ff:ff:ff:ff:ff:ff
+        inet 192.168.0.71/24 brd 192.168.0.255 scope global dynamic ens9
+        valid_lft 692448sec preferred_lft 692448sec
+        inet6 fe80::5054:ff:fe4b:735f/64 scope link
+        valid_lft forever preferred_lft forever
+
+    ```
 
 <br>
 
