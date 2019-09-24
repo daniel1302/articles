@@ -654,9 +654,185 @@ File content:
 
 ## Expand HDD
 
+#### Quick about the volume format:
+Different people prefer to use a different type of volumes.
+
+*Raw* format is the most universal and portable. You can export raw disks into another Virtualization format. Another advantage of that format is high performance.
+
+The *qcow* format provides several like features: snapshots, compressions, backups, etc.
+
+At the moment, it's not important what kind of format you choose.
+
+### Scenario 1: Attach new disk and map to specific location (/var/lib/mysql)
+
+Like You remember We use the "kvm-pool" pool as a volumes storage.
+
+1. Let's check our volumes pool.
+
+    ```
+    # virsh pool-dumpxml kvm-disks
+    <pool type='dir'>
+        <name>kvm-disks</name>
+        <uuid>4ab0ab6e-5006-4dcf-9fdf-d769946783b5</uuid>
+        <capacity unit='bytes'>7936293720064</capacity>
+        <allocation unit='bytes'>348723073024</allocation>
+        <available unit='bytes'>7587570647040</available>
+        <source>
+        </source>
+        <target>
+            <path>/mapper/red01/kvm/disks</path>
+            <permissions>
+            <mode>0755</mode>
+            <owner>0</owner>
+            <group>0</group>
+            </permissions>
+        </target>
+    </pool>
+    ```
+
+2. Go to the folder where pool is defined: `/mapper/red01/kvm/disks`
+
+3. Let's create new `10G` disk:
+
+    ```
+    # cd /mapper/red01/kvm/disks
+    # qemu-img create -f raw test-disk-10G 10G
+    Formatting 'test-disk-10G', fmt=raw size=10737418240
+    ```
+
+    You can also use dd command:
+
+    ```
+    # dd if=/dev/zero of=test-disk-2-10G bs=1M count=10240 status=progress
+    10078912512 bytes (10 GB, 9.4 GiB) copied, 9 s, 1.1 GB/s
+    10240+0 records in
+    10240+0 records out
+    10737418240 bytes (11 GB, 10 GiB) copied, 9.54978 s, 1.1 GB/s
+    ```
+
+    ```
+    # sudo ls -lh
+    total 15G
+    -rw------- 1 root root  21G Sep 24 12:30 debian10-base.qcow2
+    -rw------- 1 root root 8.1G Aug 13 09:55 debian9.qcow2
+    -rw-r--r-- 1 root root  10G Sep 24 12:27 test-disk-10G
+    -rw-r--r-- 1 root root  10G Sep 24 12:30 test-disk-2-10G
+    ```
+
+4. I am going to attach this image to the `debian10-base` VM. Let's log into that instance.
+
+    ```
+    # virsh console debian10-base
+    Connected to domain debian10-base
+    Escape character is ^]
+
+    root@debian10-base:~#
+    ```
+
+5. Find currently attached disks
+
+    ```
+    root@debian10-base:~# ls -als /dev | grep -e vd.$
+    0 brw-rw----  1 root disk    254,   0 Sep 10 12:39 vda
+    ```
+    Here You can see that currently attached is disk /dev/vda
+
+6. We can attach our disk as vdb device. Let's do this! Log out from the guest VM, then attach created volume.
+
+    ```
+    # virsh attach-disk debian10-base \
+        --source /mapper/red01/kvm/disks/test-disk-10G \
+        --target vdb \
+        --persistent
+
+    Disk attached successfully
+    ```
+
+7. Login to the guest VM and verify.
+
+    ```
+    root@debian10-base:~# fdisk -l | grep '^Disk /dev/vd[a-z]'
+    Disk /dev/vda: 20 GiB, 21474836480 bytes, 41943040 sectors
+    Disk /dev/vdb: 10 GiB, 10737418240 bytes, 20971520 sectors
+    ```
+
+8. Create a new partition
+
+    ```
+    root@debian10-base:~# fdisk /dev/vdb
+
+    Welcome to fdisk (util-linux 2.33.1).
+    Changes will remain in memory only, until you decide to write them.
+    Be careful before using the write command.
+
+    Device does not contain a recognized partition table.
+    Created a new DOS disklabel with disk identifier 0xa0b8bd13.
+
+    Command (m for help): n
+    Partition type
+    p   primary (0 primary, 0 extended, 4 free)
+    e   extended (container for logical partitions)
+    Select (default p): p
+    Partition number (1-4, default 1):
+    First sector (2048-20971519, default 2048):
+    Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-20971519, default 20971519):
+
+    Created a new partition 1 of type 'Linux' and of size 10 GiB.
+
+    Command (m for help): w
+    The partition table has been altered.
+    Calling ioctl() to re-read partition table.
+    Syncing disks.
+    ```
+
+9. Verify partitions
+
+    ```
+    root@debian10-base:~# lsblk
+    NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+    vda    254:0    0   20G  0 disk
+    ├─vda1 254:1    0  9.3G  0 part /
+    └─vda2 254:2    0 10.7G  0 part /home
+    vdb    254:16   0   10G  0 disk
+    └─vdb1 254:17   0   10G  0 part
+    ```
+
+10. Format created partition
+
+    ```
+    root@debian10-base:~# mkfs.ext4 /dev/vdb1
+    mke2fs 1.44.5 (15-Dec-2018)
+    Creating filesystem with 2621184 4k blocks and 655360 inodes
+    Filesystem UUID: 659eed8b-c913-45ad-a2a6-79c499e338a2
+    Superblock backups stored on blocks:
+            32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+
+    Allocating group tables: done
+    Writing inode tables: done
+    Creating journal (16384 blocks): done
+    Writing superblocks and filesystem accounting information: done
+
+    ```
+
+11. Mount partition to the `/var/lib/mysql`
+
+    ```
+    root@debian10-base:~#mount /dev/vdb1 /var/lib/mysql
+
+    root@debian10-base:~# mount | grep vdb1
+    /dev/vdb1 on /var/lib/mysql type ext4 (rw,relatime)
+    ```
+
+12. Add a fstab entry
+
+    ```
+    root@debian10-base:~# echo '/dev/vdb1    /var/lib/mysql    ext4    defaults    0  0' > /etc/fstab
+    root@debian10-base:~# tail -n 1 /etc/fstab
+    /dev/vdb1    /var/lib/mysql    ext4    defaults    0  0
+    ```
+
 ### Scenario 1: Expand the attached volume
 
-### Scenario 2: Attach new disk and map to specific location (/var/lib/mysql)
 
 ### Scenario 3: Attach new disk and expand root (/)
 
