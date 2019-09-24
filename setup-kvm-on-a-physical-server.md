@@ -831,10 +831,146 @@ Like You remember We use the "kvm-pool" pool as a volumes storage.
     /dev/vdb1    /var/lib/mysql    ext4    defaults    0  0
     ```
 
-### Scenario 1: Expand the attached volume
+### Scenario 2: Expand the attached volume
 
+1. Before We start let's check current file system size for particular guest
 
-### Scenario 3: Attach new disk and expand root (/)
+    ```
+    root@debian10-base:~# df -h
+    Filesystem      Size  Used Avail Use% Mounted on
+    udev            3.8G     0  3.8G   0% /dev
+    tmpfs           779M   77M  703M  10% /run
+    /dev/vda1       9.2G  1.1G  7.7G  12% /
+    tmpfs           3.9G     0  3.9G   0% /dev/shm
+    tmpfs           5.0M     0  5.0M   0% /run/lock
+    tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+    /dev/vda2        11G   41M  9.9G   1% /home
+    tmpfs           779M     0  779M   0% /run/user/0
+    /dev/vdb1       9.8G   37M  9.3G   1% /var/lib/mysql
+    ```
+
+2. Shutdown the guest VM
+
+    ```
+    root@debian10-base:~# shutdown -P now
+    ```
+
+3. On the host machine resize the disk file
+
+    ```
+    # sudo qemu-img resize -f raw ./test-disk-10G +25G
+    Image resized.
+    ```
+
+4. Start guest VM
+
+    ```
+    # virsh start  debian10-base
+    Domain debian10-base started
+    ```
+
+5. Login into guest VM, and verify filesystem
+
+    ```
+    # virsh console debian10-base
+
+    root@debian10-base:~# df -h
+    Filesystem      Size  Used Avail Use% Mounted on
+    udev            3.8G     0  3.8G   0% /dev
+    tmpfs           779M  8.4M  771M   2% /run
+    /dev/vda1       9.2G  1.1G  7.7G  12% /
+    tmpfs           3.9G     0  3.9G   0% /dev/shm
+    tmpfs           5.0M     0  5.0M   0% /run/lock
+    tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+    /dev/vdb1       9.8G   37M  9.3G   1% /var/lib/mysql
+    tmpfs           779M     0  779M   0% /run/user/0
+
+    root@debian10-base:~# lsblk
+    NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+    vda    254:0    0   20G  0 disk
+    ├─vda1 254:1    0  9.3G  0 part /
+    └─vda2 254:2    0 10.7G  0 part
+    vdb    254:16   0   35G  0 disk
+    └─vdb1 254:17   0   10G  0 part /var/lib/mysql
+    ```
+
+    As You can see disk size is 35G, but used is only 10. Let's change it.
+
+6. Modify partition
+
+    ```
+    root@debian10-base:~# fdisk /dev/vdb1
+    Command (m for help): p
+    Disk /dev/vdb: 35 GiB, 37580963840 bytes, 73400320 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0xa0b8bd13
+
+    Device     Boot Start      End  Sectors Size Id Type
+    /dev/vdb1        2048 20971519 20969472  10G 83 Linux
+
+    Command (m for help): d
+    Selected partition 1
+    Partition 1 has been deleted.
+
+    Command (m for help): p
+    Disk /dev/vdb: 35 GiB, 37580963840 bytes, 73400320 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0xa0b8bd13
+
+    Command (m for help): n
+    Partition type
+    p   primary (0 primary, 0 extended, 4 free)
+    e   extended (container for logical partitions)
+    Select (default p): p
+    Partition number (1-4, default 1):
+    First sector (2048-73400319, default 2048):
+    Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-73400319, default 73400319):
+
+    Created a new partition 1 of type 'Linux' and of size 35 GiB.
+    Partition #1 contains a ext4 signature.
+
+    Do you want to remove the signature? [Y]es/[N]o: N
+
+    Command (m for help): w
+
+    The partition table has been altered.
+    Syncing disks.
+    ```
+
+    Commands:
+    * p - Print partition table
+    * d - Delete partition
+    * n - Create new partition
+    * w - Write changes
+
+7. Resize current mount point
+
+    ```
+    root@debian10-base:~# resize2fs /dev/vdb1
+    ```
+
+8. Reboot your guest VM, then verify results
+
+    ```
+    root@debian10-base:~# reboot
+
+    root@debian10-base:~# df -h
+    Filesystem      Size  Used Avail Use% Mounted on
+    udev            3.8G     0  3.8G   0% /dev
+    tmpfs           779M  8.4M  771M   2% /run
+    /dev/vda1       9.2G  1.1G  7.7G  12% /
+    tmpfs           3.9G     0  3.9G   0% /dev/shm
+    tmpfs           5.0M     0  5.0M   0% /run/lock
+    tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+    /dev/vdb1        35G   48M   33G   1% /var/lib/mysql
+    tmpfs           779M     0  779M   0% /run/user/0
+    ```
 
 
 ... TODO ...
