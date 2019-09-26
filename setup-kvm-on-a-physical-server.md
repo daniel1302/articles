@@ -49,9 +49,10 @@ Examples:
 # KVM instalation
   
   1. Before you start installing the KVM soft, check if your processor has support for virtualization. To check your virtualization capabilities, you need to run the following command: 
-  
+
     ```
     # egrep -c '(svm|vmx)' /proc/cpuinfo
+    
     24
     ```
 
