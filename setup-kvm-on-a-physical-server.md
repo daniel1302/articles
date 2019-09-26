@@ -49,13 +49,12 @@ Examples:
 # KVM instalation
   
   1. Before you start installing the KVM soft, check if your processor has support for virtualization. To check your virtualization capabilities, you need to run the following command: 
-
+  
     ```
     # egrep -c '(svm|vmx)' /proc/cpuinfo
     24
     ```
-
-    If you can see 0, that means, your computer does not support virtualization. 
+If you can see 0, that means, your computer does not support virtualization. 
 
 2. If you can see any number larger than 0, it's valid. If your computer is not supporting virtualization, try to enable it in BIOS settings. To do it restart your computer, find the "Virtualization (VT-x/AMD-V)" option and turn it on.
 
