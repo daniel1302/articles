@@ -47,7 +47,49 @@ Examples:
 
 
 # KVM instalation
-  ... TODO ...
+  
+  1. Before you start installing the KVM soft, check if your processor has support for virtualization. To check your virtualization capabilities, you need to run the following command: 
+
+    ```
+    # egrep -c '(svm|vmx)' /proc/cpuinfo
+    24
+    ```
+
+    If you can see 0, that means, your computer does not support virtualization. 
+
+2. If you can see any number larger than 0, it's valid. If your computer is not supporting virtualization, try to enable it in BIOS settings. To do it restart your computer, find the "Virtualization (VT-x/AMD-V)" option and turn it on.
+
+3. Now you can verify if your system is correctly set up. To do it run:  the `kvm-ok` command. Correct output is:
+
+    ```
+    # kvm-ok
+    INFO: /dev/kvm exists
+    KVM acceleration can be used
+    ```
+
+4. Now You can install quemu and all required software. To do it run: `apt-get install qemu-kvm libvirt-bin bridge-utils virt-manager`
+
+5. The KVM uses virtualization extension like Intel VT for Intel processors or AMD-V for AMD processors. Let's see what modules are enabled for you:
+
+    ```
+    # lsmod | grep kvm
+    kvm_intel             212992  34
+    kvm                   598016  1 kvm_intel
+    irqbypass              16384  20 kvm
+    ```
+
+6. If your module are disabled, please run `modprobe --all kvm`
+
+7. Verify installation:
+
+    ```
+    # virsh list --all
+
+    Id Name                 State
+    ----------------------------------
+    ```
+
+8. It's done!
 
 
 # KVM configuration
@@ -971,6 +1013,3 @@ Like You remember We use the "kvm-pool" pool as a volumes storage.
     /dev/vdb1        35G   48M   33G   1% /var/lib/mysql
     tmpfs           779M     0  779M   0% /run/user/0
     ```
-
-
-... TODO ...
