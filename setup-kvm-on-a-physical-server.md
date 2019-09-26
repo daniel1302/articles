@@ -54,9 +54,8 @@ Examples:
     # egrep -c '(svm|vmx)' /proc/cpuinfo
     24
     ```
-If you can see 0, that means, your computer does not support virtualization. 
 
-2. If you can see any number larger than 0, it's valid. If your computer is not supporting virtualization, try to enable it in BIOS settings. To do it restart your computer, find the "Virtualization (VT-x/AMD-V)" option and turn it on.
+2. If you can see 0, that means, your computer does not support virtualization. If you can see any number larger than 0, it's valid. If your computer is not supporting virtualization, try to enable it in BIOS settings. To do it restart your computer, find the "Virtualization (VT-x/AMD-V)" option and turn it on.
 
 3. Now you can verify if your system is correctly set up. To do it run:  the `kvm-ok` command. Correct output is:
 
