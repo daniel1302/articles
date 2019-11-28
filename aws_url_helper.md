@@ -1,8 +1,10 @@
+#Get direct URL for AWS Cloudwatch metrics
+
+### Introduction of the problem
+
 Last time, when I developed some integration with AWS, I got in trouble when I wanted to generate a direct URL to the Cloudwatch metrics. I could not find any working solution, so I decided to write my implementation.
 
 I expect to get a URL to AWS Cloudwatch metrics for given metrics data.
-
-### Get direct URL for AWS Cloudwatch metrics
 
 What data do I have?
 
