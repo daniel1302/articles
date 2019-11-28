@@ -22,7 +22,7 @@ You can find source code for the helper I implemented on my GitHub: [AwsMetricUr
 metric_data = """
 [
     {
-        "MetricName": "prod-ecommerce-front-http-response-status-5xx",
+        "MetricName": "prod-application-front-http-response-status-5xx",
         "Namespace": "LogMetrics",
         "StatisticType": "Statistic",
         "Statistic": "SUM",
