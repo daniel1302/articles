@@ -2,6 +2,8 @@ Last time, when I developed some integration with AWS, I got in trouble when I w
 
 I expect to get a URL to AWS Cloudwatch metrics for given metrics data.
 
+### Get direct URL for AWS Cloudwatch metrics
+
 What data do I have?
 
 - Statistic,
@@ -14,7 +16,7 @@ You can find source code for the helper I implemented on my GitHub: [AwsMetricUr
 
 ### Example of usage:
 
-```
+```python
 metric_data = """
 [
     {
