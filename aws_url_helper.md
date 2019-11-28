@@ -69,6 +69,6 @@ print(url_helper.url(json.loads(metric_data2), 60, 6))
 ### Output
 
 ```
-https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~(view~'timeSeries~period~60~stacked~false~region~'us-east-1~start~'2019-11-28T11*3A01*3A47~end~'2019-11-28T17*3A01*3A47~metrics~(~(~'LogMetrics~'prod-ecommerce-front-http-response-status-5xx~(stat~'Sum))))
+https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~(view~'timeSeries~period~60~stacked~false~region~'us-east-1~start~'2019-11-28T11*3A01*3A47~end~'2019-11-28T17*3A01*3A47~metrics~(~(~'LogMetrics~'prod-application-front-http-response-status-5xx~(stat~'Sum))))
 https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~(view~'timeSeries~period~60~stacked~false~region~'us-east-1~start~'2019-11-28T11*3A01*3A47~end~'2019-11-28T17*3A01*3A47~metrics~(~(~'AWS/ApplicationELB~'RequestCount~'TargetGroup~'targetgroup/prod-application-api-alb-tg/XXXXXX33c4073540~'LoadBalancer~'app/prod-application-api-alb/XXXXXXb12cae3d294~'AvailabilityZone~'us-east-1a~(stat~'Sum))))
 ```
